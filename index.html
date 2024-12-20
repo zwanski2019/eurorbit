@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EurOrbit - European Weather Forecast</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="pattern-overlay"></div>
+    
+    <div id="earth-container">
+        <img src="https://images.unsplash.com/photo-1614730321146-b6fa6a46bcb4?auto=format&fit=crop&w=1920&q=80" 
+             alt="View of Earth from space showing Europe" 
+             id="earth-image">
+    </div>
+
+    <main class="content">
+        <h1>EurOrbit</h1>
+        <h2>European Weather Forecast</h2>
+        
+        <div class="powered-by">
+            Powered by 
+            <a href="http://www.7timer.info/" 
+               target="_blank" 
+               rel="noopener noreferrer">7timer!</a>
+        </div>
+
+        <select id="city-select" aria-label="Select a city">
+            <option value="">-- select a city --</option>
+            <option value="london">London</option>
+            <option value="paris">Paris</option>
+            <option value="berlin">Berlin</option>
+            <option value="rome">Rome</option>
+            <option value="madrid">Madrid</option>
+            <option value="amsterdam">Amsterdam</option>
+            <option value="vienna">Vienna</option>
+            <option value="prague">Prague</option>
+        </select>
+
+        <div id="weather-display">
+            <h3 id="selected-city"></h3>
+            <div class="weather-grid" id="forecast-grid"></div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; Copyright 2024 EurOrbit</p>
+    </footer>
+
+    <script src="scripts.js"></script>
+</body>
+</html>
