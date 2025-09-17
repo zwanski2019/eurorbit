@@ -26,6 +26,79 @@ const WEATHER_ICONS = {
     tsrain: '⛈️'
 };
 
+const HUMIDITY_TOOLTIP_BASE = 'Relative humidity at 2 meters above ground level';
+
+const getHumidityDetails = (rh2m) => {
+    const parseHumidityNumber = (value) => {
+        if (typeof value === 'number' && Number.isFinite(value)) {
+            return value;
+        }
+
+        if (typeof value === 'string') {
+            const trimmed = value.trim();
+            if (!trimmed) {
+                return null;
+            }
+
+            const sanitized = trimmed.endsWith('%') ? trimmed.slice(0, -1) : trimmed;
+            const numeric = Number(sanitized);
+            return Number.isFinite(numeric) ? numeric : null;
+        }
+
+        return null;
+    };
+
+    const fallback = {
+        display: 'N/A',
+        tooltip: `${HUMIDITY_TOOLTIP_BASE}. Data unavailable.`,
+    };
+
+    if (rh2m && typeof rh2m === 'object' && !Array.isArray(rh2m)) {
+        const min = parseHumidityNumber(rh2m.min);
+        const max = parseHumidityNumber(rh2m.max);
+
+        if (min !== null && max !== null) {
+            return {
+                display: `${min}–${max}%`,
+                tooltip: `${HUMIDITY_TOOLTIP_BASE}. Displayed as the minimum–maximum range for this forecast period.`,
+            };
+        }
+
+        if (min !== null) {
+            return {
+                display: `${min}%`,
+                tooltip: `${HUMIDITY_TOOLTIP_BASE}. Only the minimum value is available for this forecast period.`,
+            };
+        }
+
+        if (max !== null) {
+            return {
+                display: `${max}%`,
+                tooltip: `${HUMIDITY_TOOLTIP_BASE}. Only the maximum value is available for this forecast period.`,
+            };
+        }
+    }
+
+    const singleValue = parseHumidityNumber(rh2m);
+    if (singleValue !== null) {
+        return {
+            display: `${singleValue}%`,
+            tooltip: `${HUMIDITY_TOOLTIP_BASE}. Displayed as a single representative value for this forecast period.`,
+        };
+    }
+
+    if (typeof rh2m === 'string' && rh2m.trim()) {
+        const trimmed = rh2m.trim();
+        const withUnit = trimmed.endsWith('%') ? trimmed : `${trimmed}%`;
+        return {
+            display: withUnit,
+            tooltip: `${HUMIDITY_TOOLTIP_BASE}.`,
+        };
+    }
+
+    return fallback;
+};
+
 document.addEventListener('DOMContentLoaded', () => {
     const citySelect = document.getElementById('city-select');
     const weatherDisplay = document.getElementById('weather-display');
@@ -57,11 +130,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 const weatherItem = document.createElement('div');
                 weatherItem.className = 'weather-item';
+                const humidityDetails = getHumidityDetails(day.rh2m);
                 weatherItem.innerHTML = `
                     <div>${date.toLocaleDateString()}</div>
                     <div style="font-size: 2rem;">${WEATHER_ICONS[day.weather] || '🌈'}</div>
                     <div>${day.temp2m}°C</div>
-                    <div>Humidity: ${day.rh2m}%</div>
+                    <div>
+                        Humidity (2m):
+                        <span class="humidity-value" title="${humidityDetails.tooltip}">${humidityDetails.display}</span>
+                    </div>
                 `;
                 forecastGrid.appendChild(weatherItem);
             });
